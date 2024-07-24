@@ -1,4 +1,3 @@
-
 import os
 import json
 import random
@@ -6,11 +5,20 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from transformers import LlamaForCausalLM, AutoTokenizer
 from transformers import BitsAndBytesConfig
+from tqdm import tqdm
+
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--batch_size", type=int, default=8, help="Please specify the model to evaluate.")
+parser.add_argument("--multi_GPU", type=bool, default=False, help="Please specify whether to use multiple GPUs.")
+args = parser.parse_args()
+
 
 def token_count(string):
     return len(string.split())
     
-file_pku = open('train.jsonl', 'r')
+file_pku = open('pku_saferlhf.jsonl', 'r')
 data_pku = file_pku.readlines()
 print(len(data_pku))
 data = []
@@ -23,6 +31,8 @@ for line in data_pku:
             data.append(line)
             break
 print(len(data))
+
+data = data[:50000]
 
 
 with open('train_data.jsonl', 'w') as f:
@@ -41,17 +51,16 @@ for line in data:
 
 
 
-
-
 bnb_config = BitsAndBytesConfig(
 load_in_4bit=True,
 bnb_4bit_use_double_quant=True,
 bnb_4bit_quant_type="nf4",
 bnb_4bit_compute_dtype=torch.bfloat16
 )
-torch.cuda.set_device(4)
-model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf", cache_dir='/data/huggingface/hub',quantization_config = bnb_config)
-tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf", cache_dir='/data/huggingface/hub')
+
+
+model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf",cache_dir='/data/huggingface/hub',quantization_config = bnb_config, device_map='auto' if args.multi_GPU else 'cuda:0')
+tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf",cache_dir='/data/huggingface/hub')
 
 def get_response(prompts,b,m):
     '''Get full text, token mapping, and attention matrix for a completion
@@ -68,15 +77,13 @@ def get_response(prompts,b,m):
     outputs = model.generate(
         tokens,
         max_new_tokens=m,
-        return_dict_in_generate=True,
         do_sample=False,
         diversity_penalty=0.5,
         num_beam_groups=b*2,
         num_beams=b*2,
         num_return_sequences=b,
     )
-    sequences = outputs.sequences
-    outputs = tokenizer.batch_decode(sequences, skip_special_tokens=True)
+    outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     return outputs
 
 
@@ -97,6 +104,8 @@ correct_begin_set = {
     "However, I cannot guarantee",
     "but I must highlight that"
 }
+
+
 force_begin_set = {
     "Of course, I can assist you with that.",
     "Certainly, I can help you with that.",
@@ -114,6 +123,7 @@ force_begin_set = {
     "I'd be happy to help you with that.",
     "I can certainly assist you with that."
 }
+
 divide_set = {",", ".", "!", ":", ";", "?", "...", "-", "\"", "(", ")", "{" , "}","[","]"}
 
 
@@ -145,12 +155,11 @@ def process(line):
     return line
 
 
-
 k = 4
-batch = 4 #actually batch = batch*k
+batch = args.batch_size
 
-with open("train_data.jsonl","a") as json_file:
-    for i in range(0,len(prompts),batch):
+with open("pairwise_dataset.jsonl","a") as json_file:
+    for i in tqdm(range(0,len(prompts),batch)):
         batch_data = prompts[i:i+batch]
         batch_response = responses[i:i+batch]
         prompts_ = []

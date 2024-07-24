@@ -11,16 +11,12 @@
 # LLM-Research/Phi-3-small-128k-instruct
 
 
-
-
-
-
 import argparse
 import random
 parser = argparse.ArgumentParser()
-parser.add_argument("--model", type=str, choices=["ori","vicunna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi","dpo_llama","dpo_qwen"], help="original model name")
-parser.add_argument("--save_path", type=str, choices=["ori","vicunna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi","dpo_llama","dpo_qwen"], help="save path")
-parser.add_argument("--device", type=int, default=0, help="device")
+parser.add_argument("--model", type=str, choices=["llama2","vicuna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi"], help="Please specify the model to evaluate.")
+parser.add_argument("--save_path", type=str, default='./raw_results', help="Please specify the path to save the result.")
+parser.add_argument("--device", type=int, default=0, help="Plese specify the GPU device")
 args = parser.parse_args()
 import time
 time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
@@ -32,6 +28,7 @@ logging.basicConfig(
     datefmt='%d-%b-%y %H:%M:%S',
     level=logging.INFO
 )
+
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
 from transformers import AutoModelForCausalLM, AutoTokenizer,GenerationConfig
@@ -44,50 +41,52 @@ bnb_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype= torch.bfloat16,   # Compute dtype for 4-bit base models  "float16" or torch.bfloat16
     bnb_4bit_use_double_quant= True,  # Activate nested quantization for 4-bit base models (double quantization)
 )
-root_dir = "/home/clouduser/MirrorHub/"
 
 
-if args.model == "ori":
-        model = LlamaForCausalLM.from_pretrained(root_dir+"shakechen/Llama-2-7b-chat-hf")
-        tokenizer = AutoTokenizer.from_pretrained(root_dir+"shakechen/Llama-2-7b-chat-hf")
-elif args.model == "vicunna":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"AI-ModelScope/vicuna-7b-v1___5",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"AI-ModelScope/vicuna-7b-v1___5")
+if args.model == "llama2":
+        model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf",cache_dir='/data/huggingface/hub',quantization_config=bnb_config )
+        tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf",cache_dir='/data/huggingface/hub')
+elif args.model == "vicuna":
+    model = AutoModelForCausalLM.from_pretrained("lmsys/vicuna-7b-v1.5",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("lmsys/vicuna-7b-v1.5")
 elif args.model == "zephyr":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"modelscope/zephyr-7b-beta",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"modelscope/zephyr-7b-beta")
+    model = AutoModelForCausalLM.from_pretrained("HuggingFaceH4/zephyr-7b-beta",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("HuggingFaceH4/zephyr-7b-beta")
 elif args.model == "llama3":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"LLM-Research/Meta-Llama-3-8B-Instruct",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"LLM-Research/Meta-Llama-3-8B-Instruct")
+    model = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
 elif args.model == "glm":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"ZhipuAI/glm-4-9b-chat",quantization_config=bnb_config,trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"ZhipuAI/glm-4-9b-chat",trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained("THUDM/glm-4-9b-chat",quantization_config=bnb_config,trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained("THUDM/glm-4-9b-chat",trust_remote_code=True)
 elif args.model == "qwen_05":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"qwen/Qwen2-0___5B",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"qwen/Qwen2-0___5B")
+    model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2-0.5B-Instruct",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
 elif args.model == "qwen_15":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"qwen/Qwen2-1___5B",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"qwen/Qwen2-1___5B")
+    model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2-1.5B-Instruct",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-1.5B-Instruct")
 elif args.model == "qwen_7":
-    model = AutoModelForCausalLM.from_pretrained(root_dir+"qwen/Qwen2-7B-instruct",quantization_config=bnb_config)
-    tokenizer = AutoTokenizer.from_pretrained(root_dir+"qwen/Qwen2-7B-instruct")
+    model = AutoModelForCausalLM.from_pretrained("qwen/Qwen2-7B-instruct",quantization_config=bnb_config)
+    tokenizer = AutoTokenizer.from_pretrained("qwen/Qwen2-7B-instruct")
 elif args.model == "qwen_72":
-    model = AutoModelForCausalLM.from_pretrained("/data/models/qwen/Qwen2-72B",quantization_config=bnb_config,device_map = "auto" )
-    tokenizer = AutoTokenizer.from_pretrained("/data/models/qwen/Qwen2-72B")
+    model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2-72B-Instruct",quantization_config=bnb_config,device_map = "auto" )
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-72B-Instruct")
 elif args.model == "phi":
-    model = AutoModelForCausalLM.from_pretrained("microsoft/Phi-3-mini-128k-instruct",cache_dir = "/data/huggingface/hub/hub",quantization_config=bnb_config,trust_remote_code=True)
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-128k-instruct",cache_dir = "/data/huggingface/hub/hub",trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained("microsoft/Phi-3-mini-128k-instruct",quantization_config=bnb_config,trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-mini-128k-instruct",trust_remote_code=True)
     tokenizer.padding_side = "left"
 
+
 jsonl_filename = 'course_correction_' + args.model + time_str + '.jsonl'
+
 def get_response(prompts,b,m):
+    print(prompts)
     '''Get full text, token mapping, and attention matrix for a completion
     b: number of beams, also number of sequences to generate
     m: max number of tokens to generate
     
     '''
     tokenizer.padding_side = "left"
-    if args.model in ["llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","dpo_qwen"]:
+    if args.model in ["llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72"]:
         tokenizer.pad_token = tokenizer.eos_token
     else:
         tokenizer.pad_token = tokenizer.unk_token
@@ -117,7 +116,8 @@ def get_response(prompts,b,m):
 harmful_behaviors = []
 harmful_responses = []
 import json
-with open("test_data.jsonl", "r") as f:
+
+with open("./test.jsonl", "r") as f:
     for line in f:
         line = line.strip()
         data = json.loads(line)
@@ -218,9 +218,6 @@ return: prob list for each index
                 course_num += 1
             json_record = {"k":k,"request": requests[index], "full response": input_samples[index], "truly response": response}
             jsonl_file.write(json.dumps(json_record) + '\n')
-    probabilitiy = course_num/response_num
-
-    return probabilitiy
 
 
 b = 5  
@@ -234,16 +231,10 @@ batch_size = 10
 dict = {}
 corr_mean  =  0
 for k in k_list:
-        batch = [index_list[i:i+batch_size] for i in range(0,len(index_list),batch_size)]
-        prob_avg = 0
-        cnt = 0
-        for tmp_index_list in batch:
-         for _ in range(b):              
-            prob = (correction(tmp_index_list,k,b,m))
-            prob_avg += prob
-            cnt += 1
-        prob_avg = prob_avg/cnt
-        dict[k] = prob_avg
-        corr_mean += prob_avg
-
-
+    batch = [index_list[i:i+batch_size] for i in range(0,len(index_list),batch_size)]
+    print(batch)
+    prob_avg = 0
+    cnt = 0
+    for tmp_index_list in batch:
+        for _ in range(b):              
+            correction(tmp_index_list,k,b,m)
