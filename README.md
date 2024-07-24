@@ -1,4 +1,4 @@
-# Code for Reproduction for "Course-Correction: Safety Alignment Using Synthetic Preferences"
+# Course-Correction: Safety Alignment Using Synthetic Preferences
 
 ## Description:
 
