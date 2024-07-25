@@ -22,7 +22,7 @@ parser.add_argument("--save_path", type=str, default='./raw_results', help="Plea
 parser.add_argument("--device", type=int, default=0, help="Plese specify the GPU device")
 args = parser.parse_args()
 time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
-jsonl_filename = 'course_correction_' + args.model + time_str + '.jsonl'
+jsonl_filename = args.model + '.jsonl'
 jsonl_filename = os.path.join(args.save_path, jsonl_filename)
 logging.basicConfig(
     filename=os.path.join(args.save_path,'course_correction_'+ args.model + time_str+'.log'),
@@ -80,7 +80,6 @@ elif args.model == "phi":
 
 
 def get_response(prompts,b,m):
-    print(prompts)
     '''Get full text, token mapping, and attention matrix for a completion
     b: number of beams, also number of sequences to generate
     m: max number of tokens to generate
@@ -200,10 +199,10 @@ return: prob list for each index
             jsonl_file.write(json.dumps(json_record) + '\n')
 
 
-b = 20  
+b = 1
 m = 32
 k_list = [10,20,30,40,50,60,70,80]
-dataset_len = len(harmful_behaviors)
+dataset_len = 1
 index_list = list(range(dataset_len))
 batch_size = 10
 
@@ -212,7 +211,6 @@ dict = {}
 corr_mean  =  0
 for k in k_list:
     batch = [index_list[i:i+batch_size] for i in range(0,len(index_list),batch_size)]
-    print(batch)
     prob_avg = 0
     cnt = 0
     for tmp_index_list in batch:

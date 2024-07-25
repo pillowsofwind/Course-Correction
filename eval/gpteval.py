@@ -10,19 +10,21 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import argparse
 import random
+import os
 parser = argparse.ArgumentParser()
-parser.add_argument("--filepath", type=str,default = "eval_data_output_example.jsonl")
-parser.add_argument("--taskname",type=str,default="llama2")
+parser.add_argument("--model", type=str, choices=["llama2","vicuna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi"], help="Please specify the model to evaluate.")
+parser.add_argument("--openai_key",type=str,default=None)
+parser.add_argument("--save_path", type=str, default='./raw_results', help="path corresponding to the one in eval_data.py")
 args = parser.parse_args()
-post_fix = args.taskname
-eval_file = args.filepath
+post_fix = args.model
+eval_file = os.path.join(args.save_path, args.model + '.jsonl') 
+
 
 time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
 jsonl_filename = 'output/correction_probabilities_'+post_fix + time_str + '.jsonl'
 jsonl_filename_1 = 'output/gpt_responses_logs_'+post_fix + time_str + '.jsonl'
 client = OpenAI(
-    api_key="your key",
-    base_url="your url"
+    api_key=args.openai_key,
 )
 
 

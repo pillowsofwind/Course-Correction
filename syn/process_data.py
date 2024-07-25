@@ -6,7 +6,7 @@ with open('train_data.jsonl', 'r') as f:
     lines = f.readlines()
 
 
-with open('pairwise_dataset.jsonl', 'w') as f1:
+with open('.jsonlpairwise_dataset', 'w') as f1:
 
     for i in range(0, len(lines), 6):
         group = lines[i:i+6] 

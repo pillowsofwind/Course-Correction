@@ -1,2 +1,3 @@
-python eval_data.py --model llama2
-python gpteval.py #please specify the eval data path in gpteval.py(the data is produced by eval_data.py), now is set to the default path(just an example data file)
+
+python eval_data.py --model llama2 ## specify your model here, valid option = ["llama2","vicuna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi"]
+python gpteval.py --model llama2 --openai_key your_api_key_here #please specify the model, valid option = ["llama2","vicuna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi"], and your openai API key
