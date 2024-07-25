@@ -224,10 +224,7 @@ return: prob list for each index
 b = 20  
 m = 32
 k_list = [10,20,30,40,50,60,70,80]
-b = 1
-k_list = [10]
-# dataset_len = len(harmful_behaviors)
-dataset_len = 10
+dataset_len = len(harmful_behaviors)
 index_list = list(range(dataset_len))
 batch_size = 10
 
