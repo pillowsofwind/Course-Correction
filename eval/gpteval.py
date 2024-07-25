@@ -6,15 +6,23 @@ from tqdm import tqdm
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-post_fix = "vicunna"
-eval_file = 'output.jsonl'
+
+
+import argparse
+import random
+parser = argparse.ArgumentParser()
+parser.add_argument("--filepath", type=str,default = "eval_data_output_example.jsonl")
+parser.add_argument("--taskname",type=str,default="llama2")
+args = parser.parse_args()
+post_fix = args.taskname
+eval_file = args.filepath
 
 time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
 jsonl_filename = 'output/correction_probabilities_'+post_fix + time_str + '.jsonl'
 jsonl_filename_1 = 'output/gpt_responses_logs_'+post_fix + time_str + '.jsonl'
 client = OpenAI(
-    api_key="",
-    base_url=""
+    api_key="your key",
+    base_url="your url"
 )
 
 

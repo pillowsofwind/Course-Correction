@@ -13,22 +13,23 @@
 
 import argparse
 import random
+import logging
+import time
+import os
 parser = argparse.ArgumentParser()
 parser.add_argument("--model", type=str, choices=["llama2","vicuna","zephyr","llama3","glm","qwen_05","qwen_15","qwen_7","qwen_72","phi"], help="Please specify the model to evaluate.")
-parser.add_argument("--save_path", type=str, default='./raw_results', help="Please specify the path to save the result.")
+parser.add_argument("--save_path", type=str, default='./raw_results', help="Please specify the path to save the result, including jsonl file and log file")
 parser.add_argument("--device", type=int, default=0, help="Plese specify the GPU device")
 args = parser.parse_args()
-import time
 time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
-
-import logging
+jsonl_filename = 'course_correction_' + args.model + time_str + '.jsonl'
+jsonl_filename = os.path.join(args.save_path, jsonl_filename)
 logging.basicConfig(
-    filename='course_correction_'+ args.model + time_str+'.log',
+    filename=os.path.join(args.save_path,'course_correction_'+ args.model + time_str+'.log'),
     format='%(asctime)s - %(message)s',
     datefmt='%d-%b-%y %H:%M:%S',
     level=logging.INFO
 )
-
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = str(args.device)
 from transformers import AutoModelForCausalLM, AutoTokenizer,GenerationConfig
@@ -76,7 +77,7 @@ elif args.model == "phi":
     tokenizer.padding_side = "left"
 
 
-jsonl_filename = 'course_correction_' + args.model + time_str + '.jsonl'
+
 
 def get_response(prompts,b,m):
     print(prompts)
@@ -220,10 +221,13 @@ return: prob list for each index
             jsonl_file.write(json.dumps(json_record) + '\n')
 
 
-b = 5  
-m = 256
+b = 20  
+m = 32
 k_list = [10,20,30,40,50,60,70,80]
-dataset_len = len(harmful_behaviors)
+b = 1
+k_list = [10]
+# dataset_len = len(harmful_behaviors)
+dataset_len = 10
 index_list = list(range(dataset_len))
 batch_size = 10
 
