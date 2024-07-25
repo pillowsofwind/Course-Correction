@@ -6,7 +6,7 @@ This repo consists of core scripts for reproducing the main results of the paper
 
 ## Contributors
 
-Rongwu Xu$^1$, Yishuo Cai$^2$
+Rongwu Xu $^1$ , Yishuo Cai $^2$
 
 $^1$ Tsinghua University, $^2$ Central South University
 
@@ -14,37 +14,37 @@ If you have any questions or issues with the code, please send us an issue direc
 
 ## Introduction
 
-Our paper presents a systematic study on assessing and improving LLMs' capability to perform the task of \textbf{course-correction}, \ie, the model can steer away from generating harmful content autonomously. 
+Our paper presents a systematic study on assessing and improving LLMs' capability to perform the task of **course-correction**, i.e., the model can steer away from generating harmful content autonomously. 
 
 <p align="center">
     <img src="./figs/teaser.png" alt="teaser" width="400" /> <br>
-      Motivation: A course-corrected response (**bottom**) is less harmful than a response that initially contains harmful content but lacks subsequent correction (**top**).
+      Motivation: A course-corrected response (bottom) is less harmful than a response that initially contains harmful content but lacks subsequent correction (top).
 </p>
 
 
 ### Evaluating Course-Correction
 
-To start with, we introduce the \textsc{C2-Eval} benchmark for quantitative assessment and analyze 10 popular LLMs, revealing varying proficiency of current safety-tuned LLMs in course-correction. 
+To start with, we introduce the C $^2$-EVAL benchmark for quantitative assessment and analyze 10 popular LLMs, revealing varying proficiency of current safety-tuned LLMs in course-correction. 
 
 <p align="center">
-    <img src="./figs/evaluate.png" alt="teaser" width="600" /> <br>
+    <img src="./figs/evaluate.png" alt="teaser" width="650" /> <br>
       Evaluation: We assess LLMs' ability to perform course-correction by counting the proportion of paths that exhibit course-corrective behaviors after accepting prefilled harmful content.
 </p>
 
 
 ### Training to Course-Correct
 
-To improve, we propose fine-tuning LLMs with preference learning, emphasizing the preference for timely course-correction. Using an automated pipeline, we create \textsc{C2-Syn}, a synthetic dataset with 750K pairwise preferences, to teach models the concept of timely course-correction through data-driven preference learning. 
+To improve, we propose fine-tuning LLMs with preference learning, emphasizing the preference for timely course-correction. Using an automated pipeline, we create C $^2$-SYN, a synthetic dataset with 750K pairwise preferences, to teach models the concept of timely course-correction through data-driven preference learning. 
 
 <p align="center">
-    <img src="./figs/train.png" alt="teaser" width="600" /> <br>
+    <img src="./figs/train.png" alt="teaser" width="650" /> <br>
       Training: We train LLMs to learn course-correctiong via synthetic preferences that emphasize on: (i) course-correction and (ii) earlier course-correction in the response sequence.
 </p>
 
 
 ### Results
 
-Experiments on 2 LLMs, \textsc{Llama2-Chat 7B} and \textsc{Qwen2 7B}, show that our method effectively enhances course-correction skills without affecting general performance. Additionally, it effectively improves LLMs' safety, particularly in resisting jailbreak attacks.
+Experiments on 2 LLMs, Llama2-Chat 7B and Qwen2 7B, show that our method effectively enhances course-correction skills without affecting general performance. Additionally, it effectively improves LLMs' safety, particularly in resisting jailbreak attacks.
 
 Detailed results, analysis and case study are provided in our [Paper](https://arxiv.org/pdf/2407.16637).
 
@@ -60,11 +60,11 @@ pip install -r requirements.txt
 
 ### File Structure
 
-The project is divided into two independent parts
+The project is divided into two independent parts"
 
-> `eval` Folder - Corresponding to C$^2$-EVAL in the Paper
-
-> `syn` Folder - Corresponding to C$^2$-SYN in the Paper
+> `eval` Folder - Corresponding to C $^2$-EVAL in the Paper
+> 
+> `syn` Folder - Corresponding to C $^2$-SYN in the Paper
 
 ## Evaluating Course-Correction Performance
 
