@@ -1,6 +1,6 @@
 # Course-Correction: Safety Alignment Using Synthetic Preferences
 
-📢News 10/2/2024: Our paper got accepted by EMNLP 2024 as a Industry Paper!
+📢News 10/2/2024: Our paper got accepted by EMNLP 2024 as an Industry Paper!
 
 This repo consists of core scripts for reproducing the main results of the paper **"Course-Correction: Safety Alignment Using Synthetic Preferences"**.
 
